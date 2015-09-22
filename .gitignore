@@ -1,0 +1,7 @@
+# compiled files
+*.o
+*.a
+*.depends
+
+# log files
+*.log

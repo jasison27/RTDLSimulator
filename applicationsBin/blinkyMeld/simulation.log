@@ -1,0 +1,247 @@
+[1;33mStarting Blinky Blocks simulation (main) ...[0m
+[1;34mSimulator constructor[0m
+[1;34m  config.xml successfully loaded [0m
+Loading./program.bb with MeldInterpretVM
+Program has been loaded
+[1;34mBlinkyBlocksSimulator constructor[0m
+grid size : 100 x 100 x 100
+World constructor
+[1;31mBlinkyBlocksWorld constructor[0m
+initShaders
+Compilation of the Vertex Program
+compilation OK
+Compilation of the Fragment Program
+compilation OK
+Shaders initialized.
+loading ../../simulatorCore/smartBlocksTextures/fenetre_onglet.tga
+loading ../../simulatorCore/smartBlocksTextures/boutons_fg.tga
+loading ../../simulatorCore/smartBlocksTextures/boutons_fd.tga
+loading ../../simulatorCore/smartBlocksTextures/slider.tga
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+Smoothing groups not managed !
+No 'lighted' texture in obj file :blinkyBlockSimple.obj
+No 'lighted' texture in obj file :blinkyBlockPicking.obj
+No 'lighted' texture in obj file :repere25.obj
+loading ../../simulatorCore/blinkyBlocksTextures//texture_plane.tga
+Scheduler constructor
+MeldInterpretScheduler constructor
+blocksize =71,71,65
+default color :(1,1,1,1)
+3mScheduler Mode :2[0m
+default color :(1,1,1,1)
+position : (4,1,0,0)
+BuildingBlock constructor (id:0)
+BlinkyBlocksBlock constructor
+P2PNetworkInterface constructor
+P2PNetworkInterface constructor
+P2PNetworkInterface constructor
+P2PNetworkInterface constructor
+P2PNetworkInterface constructor
+P2PNetworkInterface constructor
+BlockCode constructor
+BlinkyBlocksBlockCode constructor
+BlinkyMeldBlockCode constructor
+MeldInterpretVM constructor
+MeldInterpretScheduler: Schedule a Compute Predicate Event (0)
+MeldInterpretScheduler: Schedule a CodeStart Event (1)
+loading ../../simulatorCore/blinkyBlocksTextures/rotot_textures.tga
+[1;33mScheduler : start order received 2202000[0m
+Realtime mode scheduler
+
+MeldInterpretScheduler: Schedule a ProcessLocal Event (3)
+0.000000 #1:   Starting BlinkyMeldBlockCode in block 1
+1 processLocalEvent: date: 0 process event Compute Predicate Event(1065), random number : 0
+MeldInterpretScheduler: Schedule a Compute Predicate Event (4)
+MeldInterpretScheduler: Schedule a ProcessLocal Event (6)
+1 processLocalEvent: date: 481 process event Compute Predicate Event(1065), random number : 0
+MeldInterpretScheduler: Schedule a SetPosition Event (7)
+MeldInterpretScheduler: Schedule a Compute Predicate Event (8)
+MeldInterpretScheduler: Schedule a ProcessLocal Event (10)
+1 processLocalEvent: date: 481 process event SetPosition Event(1068), random number : 0
+0.000481 #1: set position 2 3 0
+MeldInterpretScheduler: Schedule a ProcessLocal Event (12)
+1 processLocalEvent: date: 1008 process event Compute Predicate Event(1065), random number : 0
+I'm a BlinkyBlocksSimulator
+I'm a BlinkyBlocksSimulator
+I'm a World
+[1;34m[1;33mlocksSimulator destructor[0mnt 
+[1;34mSimulator destructor[0m
+tructor[0mnt 
+Scheduler end : 7512000[0m
+[1;34mSimulator destructor[0m
+end time : 5303000
+real time elapsed : [1;31mMeldInterpretScheduler destructor[0m
+Scheduler destructor
+Scheduler destructor
+5.310000
+Maximum sized reached by the Maximum sized reached by the events list : 3
+Size of the events list at the end : 0
+Number of events processed : 13
+Events(s) left in memory before destroying Scheduler : 0
+Message(s) left in memory before destroying Scheduler : 0
+BlinkyBlocksBlock destructor 1
+BlinkyMeldBlockCode destructor
+BlinkyBlocksBlockCode destructor
+BlockCode destructor
+BuildingBlock destructor
+World destructor
+[1;33mend (main)[0m
