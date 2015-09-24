@@ -163,6 +163,10 @@ void BlinkyBlocksBlock::addNeighbor(P2PNetworkInterface *ni, BuildingBlock* targ
 	getScheduler()->scheduleLock(new AddNeighborEvent(getScheduler()->now(), this, NeighborDirection::getOpposite(getDirection(ni)), target->blockId));
 }
 
+void BlinkyBlocksBlock::addEdge(BuildingBlock* target) {
+	getScheduler()->scheduleLock(new AddEdgeEvent(getScheduler()->now(), this, target->blockId));
+}
+
 void BlinkyBlocksBlock::removeNeighbor(P2PNetworkInterface *ni) {
 	OUTPUT << "Simulator: "<< blockId << " remove neighbor on " << NeighborDirection::getString(getDirection(ni)) << endl;
 	getScheduler()->scheduleLock(new RemoveNeighborEvent(getScheduler()->now(), this, NeighborDirection::getOpposite(getDirection(ni))));

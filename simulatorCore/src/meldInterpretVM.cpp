@@ -143,9 +143,10 @@ namespace MeldInterpret{
     else {
       queue_enqueue(newTuples, tuple, isNew);
     }
-
     tuple_print(tuple, stdout);
     puts("");
+
+
   }
 
   /* Enqueue a neighbor or vacant tuple */
@@ -304,6 +305,7 @@ namespace MeldInterpret{
       for (int i = 0; i < NUM_RULES; ++i) {
         //If a rule has all its predicate (considered ACTIVE)
         if (updateRuleState(i)) {
+          printf("rule %d is satisfied\n", i);
           waiting = 1;
           /* Set state byte used by DEBUG */
           byte processState = PROCESS_RULE | (i << 4);

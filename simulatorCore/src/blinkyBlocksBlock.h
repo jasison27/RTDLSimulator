@@ -57,6 +57,7 @@ public:
 	void removeNeighbor(P2PNetworkInterface *ni);
 	void stop(uint64_t date, State s);
 	void pauseClock(uint64_t delay, uint64_t start);
+	void addEdge(BuildingBlock* target);
 };
 
 std::ostream& operator<<(std::ostream &stream, BlinkyBlocksBlock const& bb);

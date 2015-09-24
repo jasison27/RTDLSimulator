@@ -262,6 +262,23 @@ public:
 
 //===========================================================================================================
 //
+//          AddEdgeEvent  (class)
+//
+//===========================================================================================================
+
+class AddEdgeEvent : public BlockEvent {
+public:
+	uint64_t target;
+
+	AddEdgeEvent(uint64_t, BaseSimulator::BuildingBlock *conBlock, uint64_t target);
+	AddEdgeEvent(AddEdgeEvent *ev);
+	~AddEdgeEvent();
+	void consumeBlockEvent();
+	const virtual string getEventName();
+};
+
+//===========================================================================================================
+//
 //          RemoveNeighborEvent  (class)
 //
 //===========================================================================================================

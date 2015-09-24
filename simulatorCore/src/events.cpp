@@ -381,6 +381,36 @@ const string AddNeighborEvent::getEventName() {
 
 //===========================================================================================================
 //
+//          AddEdgeEvent  (class)
+//
+//===========================================================================================================
+
+AddEdgeEvent::AddEdgeEvent(uint64_t t, BuildingBlock *conBlock, uint64_t _target): BlockEvent(t, conBlock) {
+  EVENT_CONSTRUCTOR_INFO();
+  eventType = EVENT_ADD_EDGE;
+  target = _target;
+}
+
+AddEdgeEvent::AddEdgeEvent(AddEdgeEvent *ev) : BlockEvent(ev) {
+  EVENT_CONSTRUCTOR_INFO();
+  target = ev->target;
+}
+
+AddEdgeEvent::~AddEdgeEvent() {
+  EVENT_DESTRUCTOR_INFO();
+}
+
+void AddEdgeEvent::consumeBlockEvent() {
+  EVENT_CONSUME_INFO();
+  concernedBlock->scheduleLocalEvent(EventPtr(new AddEdgeEvent(this)));
+}
+
+const string AddEdgeEvent::getEventName() {
+  return("AddEdgeEvent Event");
+}
+
+//===========================================================================================================
+//
 //          RemoveNeighborEvent  (class)
 //
 //===========================================================================================================

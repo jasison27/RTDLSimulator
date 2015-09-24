@@ -42,6 +42,7 @@
 
 // General
 #define EVENT_ADD_NEIGHBOR							1052
+#define EVENT_ADD_EDGE								1069
 #define EVENT_REMOVE_NEIGHBOR						1053
 #define EVENT_TAP									1054
 #define EVENT_SET_COLOR								1055

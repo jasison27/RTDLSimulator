@@ -122,6 +122,18 @@ void BlinkyBlocksWorld::linkBlocks() {
 			for(ix=0; ix<gridSize[0]; ix++) {
 				ptrBlock = getGridPtr(ix,iy,iz);
 				if (ptrBlock) {
+					int jx, jy, jz;
+					BlinkyBlocksBlock *another;
+					for (jz=0; jz<gridSize[2]; jz++) {
+						for (jy=0; jy<gridSize[1]; jy++) {
+							for(jx=0; jx<gridSize[0]; jx++) {
+								another=getGridPtr(jx,jy,jz);
+								if(another){
+									ptrBlock->addEdge(another);
+								}
+							}
+						}
+					}
 					if (iz<gridSize[2]-1 && getGridPtr(ix,iy,iz+1)) {
 						(ptrBlock)->getInterface(NeighborDirection::Top)->connect(getGridPtr(ix,iy,iz+1)->getInterface(NeighborDirection::Bottom));
 						OUTPUT << "connection #" << (ptrBlock)->blockId << " to #" << getGridPtr(ix,iy,iz+1)->blockId << endl;
