@@ -1,4 +1,3 @@
-type vacant(node, int).
 type linear tap(node).
 type route neighbor(node, node, int).
 

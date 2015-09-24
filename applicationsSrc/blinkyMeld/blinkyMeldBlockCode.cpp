@@ -22,6 +22,8 @@ BlinkyMeldBlockCode::BlinkyMeldBlockCode(BlinkyBlocksBlock *host): BlinkyBlocksB
   polling = false; // mode fastest
   currentLocalDate = 0; // mode fastest
   bb = (BlinkyBlocksBlock*) hostBlock;
+  vm->enqueue_unbroadcasted();
+  vm->enqueue_readycount((meld_int)0);
   if((vm != NULL)) {
     for (int i = 0; i < NUM_PORTS; i++) {
       vm->neighbors[i] = vm->get_neighbor_ID(i);
@@ -154,6 +156,7 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
         int y = (boost::static_pointer_cast<SetPositionEvent>(pev))->y;
         int z = (boost::static_pointer_cast<SetPositionEvent>(pev))->z;
         bb->setPosition(x,y,z);
+        vm->enqueue_position((meld_int)bb->position.pt[0],(meld_int)bb->position.pt[1],(meld_int)bb->position.pt[2]);
         info << "set position " << x << " " << y << " " << z;				
       }
       break;

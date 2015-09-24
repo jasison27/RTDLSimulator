@@ -170,6 +170,29 @@ namespace MeldInterpret{
     enqueueNewTuple(tuple, (record_type) isNew);
   }
 
+  /* Enqueue a edge tuple */
+  void MeldInterpretVM::enqueue_edge(NodeID neighbor){
+    if(TYPE_EDGE == -1) return;
+    tuple_t tuple = tuple_alloc(TYPE_EDGE);
+    SET_TUPLE_FIELD(tuple, 0, &neighbor);
+    enqueueNewTuple(tuple, 1);
+  }
+
+  /* Enqueue a readycount tuple */
+  void MeldInterpretVM::enqueue_readycount(meld_int count) {
+    if (TYPE_READYCOUNT == -1) return;
+    tuple_t tuple = tuple_alloc(TYPE_READYCOUNT);
+    SET_TUPLE_FIELD(tuple, 0, &count);
+    enqueueNewTuple(tuple, 1);
+  }
+
+  /* Enqueue a unbroadcasted tuple */
+  void MeldInterpretVM::enqueue_unbroadcasted() {
+    if (TYPE_UNBROADCASTED == -1) return;
+    tuple_t tuple = tuple_alloc(TYPE_UNBROADCASTED);
+    enqueueNewTuple(tuple, 1);
+  }
+
   /* Enqueue a position tuple */
   void MeldInterpretVM::enqueue_position(meld_int x, meld_int y, meld_int z) {
     if (TYPE_POSITION == -1)
@@ -234,6 +257,12 @@ namespace MeldInterpret{
         TYPE_POSITION = i;
       else if (strcmp(TYPE_NAME(i), "setposition") == 0)
         TYPE_SETPOSITION = i;
+      else if (strcmp(TYPE_NAME(i), "readycount") == 0)
+        TYPE_READYCOUNT = i;
+      else if (strcmp(TYPE_NAME(i), "edge") == 0)
+        TYPE_EDGE = i;
+      else if (strcmp(TYPE_NAME(i), "unbroadcasted") == 0)
+        TYPE_UNBROADCASTED = i;
     }
   }
 

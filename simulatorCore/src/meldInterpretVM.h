@@ -649,6 +649,8 @@ namespace MeldInterpret {
       tuple_type TYPE_SETCOLOR2;
       tuple_type TYPE_POSITION;
       tuple_type TYPE_SETPOSITION;
+      tuple_type TYPE_READYCOUNT;
+      tuple_type TYPE_UNBROADCASTED;
 
       BlinkyBlocks::BlinkyBlocksBlock *host;
 
@@ -667,6 +669,9 @@ namespace MeldInterpret {
       void __myassert(string file, int line, string exp);
       NodeID get_neighbor_ID(int face);
       void enqueueNewTuple(tuple_t tuple, record_type isNew);
+      void enqueue_edge(NodeID neighbor);
+      void enqueue_readycount(meld_int count);
+      void enqueue_unbroadcasted();
       void enqueue_position(meld_int x, meld_int y, meld_int z);
       void enqueue_face(NodeID neighbor, meld_int face, int isNew);
       void enqueue_count(meld_int count, int isNew);
