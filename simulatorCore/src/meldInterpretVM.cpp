@@ -380,7 +380,7 @@ namespace MeldInterpret{
     tuple_print(rcvdTuple, stderr);
     printf("\n", stderr);
 
-    if(!TYPE_IS_LINEAR(type) && !TYPE_IS_ACTION(type)) {
+    if(!TYPE_IS_LINEAR(type) && !TYPE_IS_ACTION(type) && face!=-1) {
       //tuple_queue *queue = receivedTuples + face;
       tuple_queue *queue = &(receivedTuples[face]);
       if(isNew > 0) {
@@ -435,7 +435,6 @@ namespace MeldInterpret{
 
 
       if (face != -1) {
-
         myassert(TYPE_SIZE(TUPLE_TYPE(tuple)) <= 17);
         MessagePtr ptr;
         if (isNew > 0) {
@@ -452,8 +451,30 @@ namespace MeldInterpret{
         MeldInterpret::getScheduler()->schedule(new VMSendMessageEvent(MeldInterpret::getScheduler()->now(), host, ptr, p2p));
       }
       else {
+        MessagePtr ptr;
+        if (isNew > 0) {
+          ptr = (MessagePtr)(new AddTupleMessage(tuple, TYPE_SIZE(TUPLE_TYPE(tuple))));
+        }
+        else {
+          ptr = (MessagePtr)(new RemoveTupleMessage(tuple, TYPE_SIZE(TUPLE_TYPE(tuple))));
+        }
+        list<BlinkyBlocks::BlinkyBlocksBlock*>::iterator it;
+        BlinkyBlocks::BlinkyBlocksBlock* toblock = NULL;
+        for (it = host->connected.begin(); it != host->connected.end(); ++ it) {
+          if((*it)->blockId == target) {
+            toblock = *it;
+            break;
+          }
+        }
+        if (toblock != NULL) {
+          printf("send message success\n");
+          MeldInterpret::getScheduler()->schedule(new VMSendMessageEvent2(MeldInterpret::getScheduler()->now(), host, ptr, toblock));
+        } else {
+          printf("send message error\n");
+        }
+
         /* This may happen when you delete a block in the simulator */
-        fprintf(stderr, "--%d--\tUNABLE TO ROUTE MESSAGE! To %d\n", (int)blockId, (int)target);
+        //fprintf(stderr, "--%d--\tUNABLE TO ROUTE MESSAGE! To %d\n", (int)blockId, (int)target);
         //exit(EXIT_FAILURE);
       }
     }

@@ -240,6 +240,37 @@ const string NetworkInterfaceReceiveEvent::getEventName() {
 
 //===========================================================================================================
 //
+//          VMReceiveMessageEvent2  (class)
+//
+//===========================================================================================================
+VMReceiveMessageEvent2::VMReceiveMessageEvent2(uint64_t t, BaseSimulator::BuildingBlock *conBlock, MessagePtr mes): BlockEvent(t, conBlock) {
+  EVENT_CONSTRUCTOR_INFO();
+  eventType = EVENT_RECEIVE_MESSAGE_FROM_BLOCK;
+  message = mes;
+  randomNumber = conBlock->getNextRandomNumber();
+}
+
+VMReceiveMessageEvent2::VMReceiveMessageEvent2(VMReceiveMessageEvent2* ev) : BlockEvent(ev) {
+  EVENT_CONSTRUCTOR_INFO();
+  message = ev->message;
+}
+
+VMReceiveMessageEvent2::~VMReceiveMessageEvent2() {
+  message.reset();
+  EVENT_DESTRUCTOR_INFO();
+}
+
+void VMReceiveMessageEvent2::consumeBlockEvent() {
+  EVENT_CONSUME_INFO();
+  concernedBlock->scheduleLocalEvent(EventPtr(new VMReceiveMessageEvent2(this)));
+}
+
+const string VMReceiveMessageEvent2::getEventName() {
+  return("VMReceiveMessage Event2");
+}
+
+//===========================================================================================================
+//
 //          NetworkInterfaceEnqueueOutgoingEvent  (class)
 //
 //===========================================================================================================

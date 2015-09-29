@@ -41,7 +41,6 @@ BlinkyMeldBlockCode::~BlinkyMeldBlockCode() {
 }
 
 void BlinkyMeldBlockCode::init() {
-  printf("BlinkyMeldBlockCode init");
   stringstream info;
 
   if((vm != NULL)) {
@@ -178,6 +177,15 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
         //info << "sends a message at face " << NeighborDirection::getString(bb->getDirection(interface))  << " to " << interface->connectedInterface->hostBlock->blockId;
       }
       break;
+    case EVENT_SEND_MESSAGE_TO_BLOCK:
+      {
+        MessagePtr message = (boost::static_pointer_cast<VMSendMessageEvent2>(pev))->message;
+        BlinkyBlocks::BlinkyBlocksBlock* target = (boost::static_pointer_cast<VMSendMessageEvent2>(pev))->target;
+        target->scheduleLocalEvent(EventPtr(new VMReceiveMessageEvent2(BaseSimulator::getScheduler()->now(), hostBlock, message) ));
+        //BlinkyBlocks::getScheduler()->schedule(new NetworkInterfaceEnqueueOutgoingEvent(BaseSimulator::getScheduler()->now(), message, interface));
+        //info << "sends a message at face " << NeighborDirection::getString(bb->getDirection(interface))  << " to " << interface->connectedInterface->hostBlock->blockId;
+      }
+      break;
     case EVENT_RECEIVE_MESSAGE: /*EVENT_NI_RECEIVE: */
       {
         MessagePtr mes = (boost::static_pointer_cast<NetworkInterfaceReceiveEvent>(pev))->message;
@@ -193,6 +201,19 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
         cout << "message received from " << command->sourceInterface->hostBlock->blockId << endl;
 #endif
         //info << "message received at face " << NeighborDirection::getString(bb->getDirection(mes->sourceInterface->connectedInterface)) << " from " << mes->sourceInterface->hostBlock->blockId;
+      }
+      break;
+    case EVENT_RECEIVE_MESSAGE_FROM_BLOCK: /*EVENT_NI_RECEIVE: */
+      {
+        MessagePtr mes = (boost::static_pointer_cast<NetworkInterfaceReceiveEvent>(pev))->message;
+        switch(mes->type){
+          case ADD_TUPLE_MSG_ID:
+            BlinkyBlocks::getScheduler()->schedule(new AddTupleEvent(BaseSimulator::getScheduler()->now(), hostBlock, boost::static_pointer_cast<AddTupleMessage>(mes)->tuple, -1));
+            break;
+          case REMOVE_TUPLE_MSG_ID:
+            BlinkyBlocks::getScheduler()->schedule(new RemoveTupleEvent(BaseSimulator::getScheduler()->now(), hostBlock, boost::static_pointer_cast<RemoveTupleMessage>(mes)->tuple, -1));
+            break;
+        }
       }
       break;
     case EVENT_ACCEL:

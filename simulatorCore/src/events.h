@@ -189,6 +189,22 @@ public:
 
 //===========================================================================================================
 //
+//          VMReceiveMessageEvent2  (class)
+//
+//===========================================================================================================
+
+class VMReceiveMessageEvent2 : public BlockEvent {
+public:
+	MessagePtr message;
+	VMReceiveMessageEvent2(uint64_t, BaseSimulator::BuildingBlock *conBlock, MessagePtr mes);
+	VMReceiveMessageEvent2(VMReceiveMessageEvent2* ev);
+	~VMReceiveMessageEvent2();
+	void consumeBlockEvent();
+	const virtual string getEventName();
+};
+
+//===========================================================================================================
+//
 //          NetworkInterfaceEnqueueOutgoingEvent  (class)
 //
 //===========================================================================================================

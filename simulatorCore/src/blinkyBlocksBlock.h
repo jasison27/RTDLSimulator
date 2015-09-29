@@ -14,6 +14,7 @@
 #include "blinkyBlocksGlBlock.h"
 #include <boost/asio.hpp>
 #include <stdexcept>
+#include <list>
 
 namespace BlinkyBlocks {
 
@@ -28,7 +29,8 @@ class BlinkyBlocksBlockCode;
 
 class BlinkyBlocksBlock : public BaseSimulator::BuildingBlock {
 	P2PNetworkInterface *tabInterfaces[6];
-
+public:
+	list<BlinkyBlocks::BlinkyBlocksBlock*>connected;
 public:
 	BlinkyBlocksGlBlock *ptrGlBlock;
 	Color color; // color of the block

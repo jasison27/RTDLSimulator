@@ -66,6 +66,24 @@ public:
 
 //===========================================================================================================
 //
+//          VMSendMessageEvent2  (class)
+//
+//===========================================================================================================
+
+class VMSendMessageEvent2 : public BlockEvent {
+public:
+	MessagePtr message;
+	BlinkyBlocks::BlinkyBlocksBlock* target;
+
+	VMSendMessageEvent2(uint64_t, BaseSimulator::BuildingBlock *conBlock, MessagePtr mes, BlinkyBlocks::BlinkyBlocksBlock* sento);
+	VMSendMessageEvent2(VMSendMessageEvent2 *ev);
+	~VMSendMessageEvent2();
+	void consumeBlockEvent();
+	const virtual string getEventName();
+};
+
+//===========================================================================================================
+//
 //          VMHandleDebugCommandEvent  (class)
 //
 //===========================================================================================================

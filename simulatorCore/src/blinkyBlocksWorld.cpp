@@ -130,6 +130,7 @@ void BlinkyBlocksWorld::linkBlocks() {
 								another=getGridPtr(jx,jy,jz);
 								if(another){
 									ptrBlock->addEdge(another);
+									ptrBlock->connected.push_back(another);
 								}
 							}
 						}

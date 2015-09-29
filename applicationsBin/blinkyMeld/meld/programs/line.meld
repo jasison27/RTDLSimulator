@@ -1,20 +1,19 @@
 type linear broadcast(node).
 type route edge(node, node).
 type linear unbroadcasted(node).
-type linear broadcasted(node).
 type linear ready(node, node).
 type linear readycount(node, int).
 type linear movealong(node).
-type linear notAtLine(node).
+type linear offline(node).
 
-notAtLine(A).
+offline(A).
 unbroadcasted(A).
 readycount(A, 0).
 
-position(A, X, Y, Z), X <> 6, notAtLine(A)
-  -o !setPosition(A, 6, Y), notAtLine(A).
+position(A, X, Y, Z), X <> 6, offline(A)
+  -o !setPosition(A, 6, Y), offline(A).
 
-position(A, 6, Y, Z), notAtLine(A)
+position(A, 6, Y, Z), offline(A)
   -o position(A, 6, Y, Z).
 
 position(A, 6, Y, Z), unbroadcasted(A)
@@ -22,4 +21,3 @@ position(A, 6, Y, Z), unbroadcasted(A)
 
 ready(A,B), readycount(A,N)
   -o readycount(A,N+1).
-
