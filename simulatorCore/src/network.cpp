@@ -56,7 +56,7 @@ string Message::getMessageName() {
 
 P2PNetworkInterface::P2PNetworkInterface(BaseSimulator::BuildingBlock *b) {
 #ifndef NDEBUG
-	OUTPUT << "P2PNetworkInterface constructor" << endl;
+	// OUTPUT << "P2PNetworkInterface constructor" << endl;
 #endif
 	hostBlock = b;
 //	localId = block->getNextP2PInterfaceLocalId();

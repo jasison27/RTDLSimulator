@@ -262,7 +262,7 @@ ObjLoader::ObjLoader(const char *rep,const char *titre) {
     						}
     					break;
     					case 's' : // gestion des groupes de lissage
-    						ERRPUT << "Smoothing groups not managed !" << endl;
+    						// ERRPUT << "Smoothing groups not managed !" << endl;
     					break;
 #ifdef DEBUG
     					default :
@@ -289,7 +289,7 @@ ObjLoader::ObjLoader(const char *rep,const char *titre) {
 	// find 'lighted' texture
 	ptrMtlLighted = mtls->getMtlByName("lighted");
 	if (!ptrMtlLighted) {
-		ERRPUT << "No 'lighted' texture in obj file :" << titre << endl;
+		// ERRPUT << "No 'lighted' texture in obj file :" << titre << endl;
 		ptrMtlLighted = mtls->getMtlById(1);
 	}
 }

@@ -82,7 +82,7 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
   stringstream info;
   assert(vm != NULL);
   info.str("");
-  OUTPUT << bb->blockId << " processLocalEvent: date: "<< BaseSimulator::getScheduler()->now() << " process event " << pev->getEventName() << "(" << pev->eventType << ")" << ", random number : " << pev->randomNumber << endl;
+  // OUTPUT << bb->blockId << " processLocalEvent: date: "<< BaseSimulator::getScheduler()->now() << " process event " << pev->getEventName() << "(" << pev->eventType << ")" << ", random number : " << pev->randomNumber << endl;
 
 #ifdef TEST_DETER
   cout << bb->blockId << " processLocalEvent: date: "<< BaseSimulator::getScheduler()->now() << " process event " << pev->getEventName() << "(" << pev->eventType << ")" << ", random number : " << pev->randomNumber << endl;
@@ -133,7 +133,7 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
         vm->neighbors[face] = 0;
         vm->enqueue_face(vm->neighbors[face], face, -1);
         BaseSimulator::getScheduler()->schedule(new ComputePredicateEvent(BaseSimulator::getScheduler()->now(), bb));
-        info << "Remove neighbor at face " << BlinkyBlocks::NeighborDirection::getString(BlinkyBlocks::NeighborDirection::getOpposite(face));
+        // info << "Remove neighbor at face " << BlinkyBlocks::NeighborDirection::getString(BlinkyBlocks::NeighborDirection::getOpposite(face));
       }
       break;
     case EVENT_TAP:

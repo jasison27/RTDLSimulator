@@ -146,8 +146,6 @@ namespace MeldInterpret{
     }
     tuple_print(tuple, stdout);
     puts("");
-
-
   }
 
   /* Enqueue a neighbor or vacant tuple */
@@ -3201,6 +3199,7 @@ eval_loop:
 #ifdef LOG_DEBUG
     printDebug(str);
 #else
+    OUTPUT << str << endl;
     fprintf(fp,"%s",str);
 #endif
   }

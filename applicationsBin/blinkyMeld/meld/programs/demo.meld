@@ -31,5 +31,5 @@ ready(A, B), readycount(A, N), N < total - 1
 ready(A, B), readycount(A, N), N = total - 1
   -o movealong(A).
 
-!movealong(A), position(A, X, Y, Z), Y < 8, Y > -1
+!movealong(A), position(A, X, Y, Z), Y < 9, Y > -1
   -o !moveTo(A, X, Y + offset).

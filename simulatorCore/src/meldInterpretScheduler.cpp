@@ -245,7 +245,7 @@ bool MeldInterpretScheduler::schedule(Event *ev) {
 
     EventPtr pev(ev);
 
-    OUTPUT << "MeldInterpretScheduler: Schedule a " << pev->getEventName() << " (" << ev->id << ")" << endl;
+    // OUTPUT << "MeldInterpretScheduler: Schedule a " << pev->getEventName() << " (" << ev->id << ")" << endl;
 
     // (pev->date > maximumDate) condition was removed because
     // Blinky Block system never ends.
