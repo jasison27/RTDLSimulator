@@ -351,8 +351,6 @@ namespace MeldInterpret{
       while(!queue_is_empty(&(receivedTuples[i]))) {
         tuple_t tuple = queue_dequeue(&receivedTuples[i], NULL);
         printf("--%d--\tDelete received ", blockId);
-        tuple_print(tuple, stdout);
-        printf("\n");
         enqueueNewTuple(tuple, (record_type) -1);
       }
 
@@ -467,7 +465,6 @@ namespace MeldInterpret{
           }
         }
         if (toblock != NULL) {
-          printf("send message success\n");
           MeldInterpret::getScheduler()->schedule(new VMSendMessageEvent2(MeldInterpret::getScheduler()->now(), host, ptr, toblock));
         } else {
           printf("send message error\n");
