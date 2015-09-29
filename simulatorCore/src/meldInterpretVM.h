@@ -649,6 +649,7 @@ namespace MeldInterpret {
       tuple_type TYPE_SETCOLOR2;
       tuple_type TYPE_POSITION;
       tuple_type TYPE_SETPOSITION;
+      tuple_type TYPE_MOVETO;
       tuple_type TYPE_READYCOUNT;
       tuple_type TYPE_UNBROADCASTED;
 
@@ -699,6 +700,7 @@ namespace MeldInterpret {
         setColor(color);
       }
       void setPosition(int x, int y, int z);
+      void moveTo(int x, int y, int z);
       inline void setLEDWrapper(byte r, byte g, byte b, byte intensity){
         setLED(r, g, b, intensity);
       }

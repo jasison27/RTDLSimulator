@@ -16,3 +16,4 @@
 (deftuple remove-priority (:type-addr) :action :linear)
 (deftuple position (:type-addr :type-int :type-int :type-int) :linear) 
 (deftuple setPosition (:type-addr :type-int :type-int) :action)
+(deftuple moveTo (:type-addr :type-int :type-int) :action)

@@ -164,10 +164,36 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
         bb->setPosition(x,y,z);
         vm->enqueue_position((meld_int)bb->position.pt[0],(meld_int)bb->position.pt[1],(meld_int)bb->position.pt[2]);
         BaseSimulator::getScheduler()->schedule(new ComputePredicateEvent(BaseSimulator::getScheduler()->now(), bb));
-        info << "set position " << x << " " << y << " " << z;				
+        info << "set position " << x << " " << y << " " << z;
       }
       break;
-
+    case EVENT_MOVE_TO:
+      {
+        bb->getTime();
+        int x = (boost::static_pointer_cast<MoveToEvent>(pev))->x;
+        int y = (boost::static_pointer_cast<MoveToEvent>(pev))->y;
+        int z = (boost::static_pointer_cast<MoveToEvent>(pev))->z;
+        Vecteur position = bb->position;
+        int _x = position.pt[0];
+        int _y = position.pt[1];
+        int _z = position.pt[2];
+        if (z != _z) {
+          puts("error with move to action");
+        } else if (y == _y && x != _x) {
+          int tx = _x + (x - _x) / abs(x - _x);
+          bb->setPosition(tx,y,z);
+          vm->enqueue_position((meld_int)bb->position.pt[0],(meld_int)bb->position.pt[1],(meld_int)bb->position.pt[2]);
+          BaseSimulator::getScheduler()->schedule(new ComputePredicateEvent(BaseSimulator::getScheduler()->now(), bb));
+        } else if (x == _x && y != _y) {
+          int ty = _y + (y - _y) / abs(y - _y);
+          bb->setPosition(x,ty,z);
+          vm->enqueue_position((meld_int)bb->position.pt[0],(meld_int)bb->position.pt[1],(meld_int)bb->position.pt[2]);
+          BaseSimulator::getScheduler()->schedule(new ComputePredicateEvent(BaseSimulator::getScheduler()->now(), bb));
+        } else {
+          puts("error with move to action");
+        }
+       }
+       break;
       /*The interface being connected is tested in function tuple_send of the MeldInterpVM*/
     case EVENT_SEND_MESSAGE:
       {

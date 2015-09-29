@@ -257,6 +257,23 @@ public:
 	const virtual string getEventName();
 };
 
+//===========================================================================================================
+//
+//          MoveToEvent  (class)
+//
+//===========================================================================================================
+
+class MoveToEvent : public BlockEvent {
+public:
+	int x, y, z;
+
+	MoveToEvent(uint64_t, BaseSimulator::BuildingBlock *conBlock, int _x, int _y, int _z);
+	MoveToEvent(MoveToEvent *ev);
+	~MoveToEvent();
+	void consumeBlockEvent();
+	const virtual string getEventName();
+};
+
 
 //===========================================================================================================
 //

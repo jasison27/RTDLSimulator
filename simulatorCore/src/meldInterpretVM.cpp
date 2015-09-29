@@ -37,6 +37,7 @@ namespace MeldInterpret{
     TYPE_SETCOLOR2 = -1;
     TYPE_POSITION = -1;
     TYPE_SETPOSITION = -1;
+    TYPE_MOVETO = -1;
 
     OUTPUT << "MeldInterpretVM constructor" << endl;
     vm_alloc();
@@ -258,6 +259,8 @@ namespace MeldInterpret{
         TYPE_POSITION = i;
       else if (strcmp(TYPE_NAME(i), "setposition") == 0)
         TYPE_SETPOSITION = i;
+      else if (strcmp(TYPE_NAME(i), "moveto") == 0)
+        TYPE_MOVETO = i;
       else if (strcmp(TYPE_NAME(i), "readycount") == 0)
         TYPE_READYCOUNT = i;
       else if (strcmp(TYPE_NAME(i), "edge") == 0)
@@ -305,7 +308,6 @@ namespace MeldInterpret{
       for (int i = 0; i < NUM_RULES; ++i) {
         //If a rule has all its predicate (considered ACTIVE)
         if (updateRuleState(i)) {
-          printf("rule %d is satisfied\n", i);
           waiting = 1;
           /* Set state byte used by DEBUG */
           byte processState = PROCESS_RULE | (i << 4);
@@ -599,7 +601,10 @@ namespace MeldInterpret{
     BaseSimulator::getScheduler()->schedule(new SetColorEvent(BaseSimulator::getScheduler()->now(), host , (float)r/255, (float)g/255, (float)b/255, (float)intensity/255));
   }
   void MeldInterpretVM::setPosition(int x, int y, int z) {
-    BaseSimulator::getScheduler()->schedule(new SetPositionEvent(BaseSimulator::getScheduler()->now(), host , x, y, 0));
+    BaseSimulator::getScheduler()->schedule(new SetPositionEvent(BaseSimulator::getScheduler()->now(), host , x, y, z));
+  }
+  void MeldInterpretVM::moveTo(int x, int y, int z) {
+    BaseSimulator::getScheduler()->schedule(new MoveToEvent(BaseSimulator::getScheduler()->now()+500000, host, x, y, z));
   }
 
 
@@ -1070,6 +1075,13 @@ namespace MeldInterpret{
 
         /* Don't call it directly to avoid having to import led.bbh */
         setPosition(MELD_INT(GET_TUPLE_FIELD(action_tuple, 0)),
+            MELD_INT(GET_TUPLE_FIELD(action_tuple, 1)),
+            0);
+      }
+      FREE_TUPLE(action_tuple);
+    } else if (type == TYPE_MOVETO) {
+      if (isNew > 0) {
+        moveTo(MELD_INT(GET_TUPLE_FIELD(action_tuple, 0)),
             MELD_INT(GET_TUPLE_FIELD(action_tuple, 1)),
             0);
       }

@@ -380,6 +380,41 @@ const string SetPositionEvent::getEventName() {
 
 //===========================================================================================================
 //
+//          MoveToEvent  (class)
+//
+//===========================================================================================================
+
+MoveToEvent::MoveToEvent(uint64_t t, BuildingBlock *conBlock, int _x, int _y, int _z): BlockEvent(t, conBlock) {
+  EVENT_CONSTRUCTOR_INFO();
+  eventType = EVENT_MOVE_TO;
+  randomNumber = conBlock->getNextRandomNumber();
+  x = _x; y = _y; z = _z;
+}
+
+
+MoveToEvent::MoveToEvent(MoveToEvent *ev) : BlockEvent(ev) {
+  EVENT_CONSTRUCTOR_INFO();
+  x = ev->x;
+  y = ev->y;
+  z = ev->z;
+  //randomNumber = ev->randomNumber;
+}
+
+MoveToEvent::~MoveToEvent() {
+  EVENT_DESTRUCTOR_INFO();
+}
+
+void MoveToEvent::consumeBlockEvent() {
+  EVENT_CONSUME_INFO();
+  concernedBlock->scheduleLocalEvent(EventPtr(new MoveToEvent(this)));
+}
+
+const string MoveToEvent::getEventName() {
+  return("MoveTo Event");
+}
+
+//===========================================================================================================
+//
 //          AddNeighborEvent  (class)
 //
 //===========================================================================================================

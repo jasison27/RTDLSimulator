@@ -9,3 +9,6 @@
 # ctag files
 *.tags*
 
+# backup files
+*.bak
+
