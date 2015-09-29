@@ -1,0 +1,35 @@
+type linear broadcast(node).
+type route edge(node, node).
+type linear unbroadcasted(node).
+type linear ready(node, node).
+type linear readycount(node, int).
+type movealong(node).
+type linear offline(node).
+type linear online(node).
+
+const line = 3.
+const total = 4.
+const offset = 6.
+
+readycount(A, 0).
+unbroadcasted(A).
+offline(A).
+
+
+offline(A), position(A, X, Y, Z), X <> line
+  -o offline(A), !moveTo(A, line, Y).
+
+offline(A), position(A, X, Y, Z), X = line
+  -o online(A), position(A, X, Y, Z).
+
+online(A), unbroadcasted(A)
+  -o {B | !edge(A,B) | ready(B,A)}.
+
+ready(A, B), readycount(A, N), N < total - 1
+  -o readycount(A,N+1).
+
+ready(A, B), readycount(A, N), N = total - 1
+  -o movealong(A).
+
+!movealong(A), position(A, X, Y, Z), Y < 8, Y > -1
+  -o !moveTo(A, X, Y + offset).
