@@ -1,7 +1,0 @@
-type linear broadcast(node).
-type route edge(node, node).
-
-const line = 6.
-
-position(A, X, Y, Z), X <> line
-  -o !moveTo(A, line, Y).

@@ -18,7 +18,7 @@
 	#define ERRPUT log_file
 #else
 	#define OUTPUT cout
-	#define ERRPUT cerr
+	#define ERRPUT stderr
 #endif
 
 #endif

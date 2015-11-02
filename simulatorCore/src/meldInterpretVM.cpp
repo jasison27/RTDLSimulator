@@ -5,8 +5,6 @@
 #include <iostream>
 #include "meldInterpretVM.h"
 
-//#define DEBUG_INSTRS
-//#define LOG_DEBUG
 #define myassert(e)	((e) ? (void)0 : __myassert(__FILE__, __LINE__,#e))
 
 
@@ -387,7 +385,6 @@ namespace MeldInterpret{
     tuple_type type = TUPLE_TYPE(rcvdTuple);
     size_t tuple_size = TYPE_SIZE(type);
     tuple_print(rcvdTuple, stderr);
-    printf("\n", stderr);
 
     if(!TYPE_IS_LINEAR(type) && !TYPE_IS_ACTION(type) && face!=-1) {
       //tuple_queue *queue = receivedTuples + face;
@@ -537,13 +534,6 @@ namespace MeldInterpret{
   }
 
   void MeldInterpretVM::__myassert(string file, int line, string exp) {
-#ifdef LOG_DEBUG
-    //{
-    char str[50];
-    sprintf(str, "myassert %s:%d %s", file, line, exp);
-    printDebug(str);
-    //}
-#endif
     /*
        while (1) {
        setColor(RED);
@@ -787,10 +777,7 @@ namespace MeldInterpret{
     Register *dst = &(reg)[VAL_REG(reg_index)];
     *dst = (Register)tuple;
 
-#if 0
-    printf ("--%d--\t MOVE %s to reg %d\n", getBlockId(),
-        tuple_names[TUPLE_TYPE(reg[reg_index])], reg_index);
-#endif
+
   }
 
   /* ************* INSTRUCTION EXECUTION FUNCTIONS ************* */
@@ -802,12 +789,7 @@ namespace MeldInterpret{
     byte reg_index = FETCH(pc);
     tuple_t *dst = (void**)eval_reg (reg_index, &pc, reg);
     *dst = ALLOC_TUPLE(TYPE_SIZE(type));
-#if defined(DEBUG_INSTRS) || defined(DEBUG_ALLOCS)
-    {
-      printf ("--%d--\t ALLOC %s TO reg %d\n",
-          getBlockId(), tuple_names[type], reg_index);
-    }
-#endif
+
     memset (*dst, 0, TYPE_SIZE(type));
     TUPLE_TYPE(*dst) = type;
   }
@@ -820,15 +802,6 @@ namespace MeldInterpret{
     byte reg_index = FETCH(pc);
     Register tuple_reg = reg[reg_index];
 
-#ifdef DEBUG_INSTRS
-    tuple_type type = TUPLE_TYPE((tuple_t)tuple_reg);
-    if (isNew < 0)
-      printf ("--%d--\t Enqueue fact reg %d: %s\n",
-          getBlockId(), reg_index, tuple_names[type]);
-    else
-      printf ("--%d--\t Enqueue RETRACTION fact reg %d: %s\n",
-          getBlockId(), reg_index, tuple_names[type]);
-#endif
     enqueueNewTuple((tuple_t)MELD_CONVERT_REG_TO_PTR(tuple_reg), (record_type) isNew);
   }
 
@@ -840,14 +813,7 @@ namespace MeldInterpret{
 
     byte reg_index = FETCH(pc);
     Register tuple_reg = reg[reg_index];
-
-#ifdef DEBUG_INSTRS
-    tuple_type type = TUPLE_TYPE((tuple_t)tuple_reg);
-    printf ("--%d--\t UPDATE reg %d: %s\n", getBlockId(), reg_index,
-        tuple_names[type]);
-#else
     (void)tuple_reg;
-#endif
   }
 
   /* Send tuple pointed at by 'send_reg' to blockID designated by send_rt
@@ -858,10 +824,6 @@ namespace MeldInterpret{
     Register send_reg = reg[SEND_MSG(pc)];
     NodeID send_rt = reg[SEND_RT(pc)];
 
-#ifdef DEBUG_INSTRS
-    printf("--%d--\t SEND reg %d TO reg %d\n",
-        getBlockId(), SEND_MSG(pc), SEND_RT(pc));
-#endif
 
     tuple_send((tuple_t)MELD_CONVERT_REG_TO_PTR(send_reg), send_rt, 0, isNew);
   }
@@ -883,16 +845,6 @@ namespace MeldInterpret{
     byte arg1_index = FETCH(pc);
     Register *arg1 = (Register*)eval_reg (arg1_index, &pc, reg);
 
-#ifdef DEBUG_INSTRS
-    if (functionID == NODE2INT_FUNC)
-      /* No need to do anything for this function since VM is already *
-       * considering node args as NodeID's, which are int's           */
-      printf("--%d--\t CALL1 node2int/%d TO reg %d = (reg %d)\n",
-          getBlockId(), arg1_index, dst_index, arg1_index);
-    else
-      printf("--%d--\t CALL1 (some func)/%d TO reg %d = (reg %d)\n",
-          getBlockId(), arg1_index, dst_index, arg1_index);
-#endif
     if (functionID == NODE2INT_FUNC) {
       *dst = MELD_NODE_ID(arg1);
     } else {
@@ -918,10 +870,6 @@ namespace MeldInterpret{
     pc += 2;
     meld_int *delay = (meld_int*)eval_int(&pc);
 
-#ifdef DEBUG_INSTRS
-    printf("--%d--\t SEND reg %d TO reg %d(%d) WITH DELAY %dms\n",
-        getBlockId(), SEND_MSG(pc), SEND_RT(pc), send_rt, *delay);
-#endif
 
     if(tpl == dst) {
       tuple_send((tuple_t)MELD_CONVERT_REG_TO_PTR(send_reg), getBlockId(), *delay, isNew);
@@ -956,11 +904,6 @@ namespace MeldInterpret{
 
       entry = entry->next;
     }
-
-#ifdef DEBUG_INSTRS
-    printf("--%d--\t ITER %s len=%d TO reg %d\n",
-        getBlockId(), tuple_names[type], length, reg_store_index);
-#endif
 
     if(length == 0) {
       free(list);
@@ -1009,11 +952,6 @@ namespace MeldInterpret{
         matched = matched && (memcmp(field, val, type_size) == 0);
       }
 
-#ifdef DEBUG_INSTRS
-      printf("--%d--\t MATCHED: %d | length: %d\n", getBlockId(),
-          matched, length);
-#endif
-
       if (matched) {
         /* We've got a match! */
         moveTupleToReg (reg_store_index, next_tuple, reg);
@@ -1046,14 +984,6 @@ namespace MeldInterpret{
   inline void MeldInterpretVM::execute_run_action0 (tuple_t action_tuple, tuple_type type, int isNew) {
     if (type == TYPE_SETCOLOR) {
       if (isNew > 0) {
-#ifdef DEBUG_INSTRS
-        printf ("--%d--\t RUN ACTION: %s(currentNode, %d, %d, %d, %d)\n",
-            getBlockId(), tuple_names[type],
-            MELD_INT(GET_TUPLE_FIELD(action_tuple, 0)),
-            MELD_INT(GET_TUPLE_FIELD(action_tuple, 1)),
-            MELD_INT(GET_TUPLE_FIELD(action_tuple, 2)),
-            MELD_INT(GET_TUPLE_FIELD(action_tuple, 3)));
-#endif
 
         /* Don't call it directly to avoid having to import led.bbh */
         setLEDWrapper(*(byte *)GET_TUPLE_FIELD(action_tuple, 0),
@@ -1064,11 +994,6 @@ namespace MeldInterpret{
       FREE_TUPLE(action_tuple);
     } else if (type == TYPE_SETCOLOR2) {
       if (isNew > 0) {
-#ifdef DEBUG_INSTRS
-        printf ("--%d--\t RUN ACTION: %s(currentNode, %d)\n",
-            getBlockId(), tuple_names[type],
-            MELD_INT(GET_TUPLE_FIELD(action_tuple, 0)));
-#endif
 
         /* Don't call it directly to avoid having to import led.bbh */
         setColorWrapper(MELD_INT(GET_TUPLE_FIELD(action_tuple, 0)));
@@ -1076,11 +1001,6 @@ namespace MeldInterpret{
       FREE_TUPLE(action_tuple);
     } else if (type == TYPE_SETPOSITION) {
       if (isNew > 0) {
-#ifdef DEBUG_INSTRS
-        printf ("--%d--\t RUN ACTION: %s(currentNode, %d)\n",
-            getBlockId(), tuple_names[type],
-            MELD_INT(GET_TUPLE_FIELD(action_tuple, 0)));
-#endif
 
         /* Don't call it directly to avoid having to import led.bbh */
         setPosition(MELD_INT(GET_TUPLE_FIELD(action_tuple, 0)),
@@ -1116,11 +1036,6 @@ namespace MeldInterpret{
       tuple_type type = TUPLE_TYPE(MELD_CONVERT_REG_TO_PTR(reg[reg_remove]));
       int size = TYPE_SIZE(type);
 
-#ifdef DEBUG_INSTRS
-      printf ("--%d--\t REMOVE reg %d: %s of size %d\n",
-          getBlockId(), reg_remove, tuple_names[type], size);
-#endif
-
       tuple_handle(memcpy(malloc(size),MELD_CONVERT_REG_TO_PTR(reg[reg_remove]), size), -1, reg);
       reg[REMOVE_REG(pc)] = 0;
     }
@@ -1141,12 +1056,6 @@ namespace MeldInterpret{
 
     Register *dst = (Register*)eval_field (dst_tuple, &pc);
 
-
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE INT %d TO FIELD %d.%d\n",
-        getBlockId(), MELD_INT(src), reg_index, field_num);
-#endif
-
     size_t size = TYPE_ARG_SIZE(type, field_num);
 
     memcpy(dst, src, size);
@@ -1159,11 +1068,6 @@ namespace MeldInterpret{
     Register *src = (Register*)eval_int (&pc);
     byte reg_index = FETCH(pc);
     Register *dst = (Register*)eval_reg (reg_index, &pc, reg);
-
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE INT %d TO reg %d\n",
-        getBlockId(), MELD_INT(src), reg_index);
-#endif
     size_t size = sizeof(Register);
     memcpy(dst, src, size);
   }
@@ -1176,10 +1080,6 @@ namespace MeldInterpret{
     byte reg_index = FETCH(pc);
     Register *dst = (Register*)eval_reg (reg_index, &pc, reg);
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE FLOAT %f TO reg %d\n",
-        getBlockId(), MELD_FLOAT(src), reg_index);
-#endif
 
     size_t size = sizeof(Register);
     memcpy(dst, src, size);
@@ -1198,12 +1098,6 @@ namespace MeldInterpret{
 
     Register *dst = (Register*)eval_field (dst_tuple, &pc);
 
-
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE FLOAT %f TO FIELD %d.%d\n",
-        getBlockId(), MELD_FLOAT(src), reg_index, field_num);
-#endif
-
     size_t size = TYPE_ARG_SIZE(type, field_num);
 
     memcpy(dst, src, size);
@@ -1221,13 +1115,7 @@ namespace MeldInterpret{
     byte reg_index = FETCH(pc);
     Register *dst = (Register*)eval_reg (reg_index, &pc, reg);
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE FIELD %d.%d TO reg %d\n",
-        getBlockId(), field_reg, field_num,
-        reg_index);
-#else
     (void)field_num;
-#endif
     size_t size = TYPE_ARG_SIZE(TUPLE_TYPE(tpl), field_num);
     memcpy(dst, src, size);
   }
@@ -1246,10 +1134,6 @@ namespace MeldInterpret{
     tuple_type type = TUPLE_TYPE(field_tpl);
     Register *dst = (Register*)eval_field (field_tpl, &pc);
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE REG %d TO FIELD %d.%d\n",
-        getBlockId(), reg_index, field_reg, field_num);
-#endif
 
     size_t size = TYPE_ARG_SIZE(type, field_num);
 
@@ -1272,13 +1156,7 @@ namespace MeldInterpret{
     tuple_type type = TUPLE_TYPE(dst_field_tpl);
     Register *dst = (Register*)eval_field (dst_field_tpl, &pc);
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE FIELD %d.%d TO FIELD %d.%d\n",
-        getBlockId(), src_field_reg, src_field_num,
-        dst_field_reg, dst_field_num);
-#else
     (void) src_field_num;
-#endif
 
     size_t size = TYPE_ARG_SIZE(type, dst_field_num);
 
@@ -1298,11 +1176,6 @@ namespace MeldInterpret{
     tuple_type type = TUPLE_TYPE(field_tpl);
     Register *dst = (Register*)eval_field (field_tpl, &pc);
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE HOST TO FIELD %d.%d\n",
-        getBlockId(), field_reg, field_num);
-#endif
-
     size_t size = TYPE_ARG_SIZE(type, field_num);
 
     memcpy(dst, src, size);
@@ -1317,10 +1190,6 @@ namespace MeldInterpret{
     byte reg_index = FETCH(pc);
     Register *dst = (Register*)eval_reg (reg_index, &pc, reg);
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE HOST TO reg %d\n",
-        getBlockId(), reg_index);
-#endif
 
     size_t size = sizeof(Register);
 
@@ -1337,10 +1206,6 @@ namespace MeldInterpret{
     byte dst_reg_index = FETCH(pc);
     Register *dst = (Register*)eval_reg (dst_reg_index, &pc, reg);
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t MOVE REG %d TO REG %d\n",
-        getBlockId(), src_reg_index, dst_reg_index);
-#endif
 
     size_t size = sizeof(Register);
 
@@ -1364,10 +1229,6 @@ namespace MeldInterpret{
     else
       *dest = 1;
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t NOT reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2);
-#endif
   }
 
   /* Perform boolean OR operation */
@@ -1384,10 +1245,6 @@ namespace MeldInterpret{
 
     *dest = (MELD_BOOL(arg1) | MELD_BOOL(arg2));
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t BOOL reg %d OR reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_boolequal (const unsigned char *pc, Register *reg) {
@@ -1402,11 +1259,6 @@ namespace MeldInterpret{
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
 
     *dest = (MELD_BOOL(arg1) == MELD_BOOL(arg2));
-
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t BOOL reg %d EQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_boolnotequal (const unsigned char *pc, Register *reg) {
@@ -1422,10 +1274,6 @@ namespace MeldInterpret{
 
     *dest = (MELD_BOOL(arg1) != MELD_BOOL(arg2));
 
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t BOOL reg %d NOT EQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   /* Compares two blockId and store the result to 'dest' */
@@ -1440,10 +1288,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_NODE_ID(arg1) == MELD_NODE_ID(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t ADDR reg %d EQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   /* Compares two blockId and store the result to 'dest' */
@@ -1458,10 +1302,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_NODE_ID(arg1) != MELD_NODE_ID(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t ADDR reg %d NOTEQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   /* Same with and int... */
@@ -1476,10 +1316,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) == MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d EQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intnotequal (const unsigned char *pc, Register *reg) {
@@ -1493,10 +1329,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) != MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d NOTEQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intgreater (const unsigned char *pc, Register *reg) {
@@ -1510,10 +1342,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) > MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d GREATER THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intgreaterequal (const unsigned char *pc, Register *reg) {
@@ -1527,10 +1355,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) >= MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d GREATER/EQUAL THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intlesser (const unsigned char *pc, Register *reg) {
@@ -1544,10 +1368,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) < MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d LESSER THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intlesserequal (const unsigned char *pc, Register *reg) {
@@ -1561,10 +1381,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) <= MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d LESSER/EQUAL THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intmul (const unsigned char *pc, Register *reg) {
@@ -1578,10 +1394,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) * MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d MULTIPLIED BY reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intdiv (const unsigned char *pc, Register *reg) {
@@ -1595,10 +1407,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) / MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d DIVIDED BY reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intmod (const unsigned char *pc, Register *reg) {
@@ -1612,9 +1420,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) % MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d MOD reg %d TO reg %d\n", getBlockId(), reg1, reg2, reg3);
-#endif
 
   }
   inline void MeldInterpretVM::execute_intplus (const unsigned char *pc, Register *reg) {
@@ -1628,10 +1433,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) + MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d PLUS reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_intminus (const unsigned char *pc, Register *reg) {
@@ -1645,10 +1446,6 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_INT(arg1) - MELD_INT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t INT reg %d MINUS reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
   }
 
   inline void MeldInterpretVM::execute_floatplus (const unsigned char *pc, Register *reg) {
@@ -1662,10 +1459,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) + MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d PLUS reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatminus (const unsigned char *pc, Register *reg) {
@@ -1679,10 +1473,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) - MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d MINUS reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatmul (const unsigned char *pc, Register *reg) {
@@ -1696,10 +1487,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) * MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d MULTIPLIED BY reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatdiv (const unsigned char *pc, Register *reg) {
@@ -1713,10 +1501,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) / MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d DIVIDED BY reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatequal (const unsigned char *pc, Register *reg) {
@@ -1730,10 +1515,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) == MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d EQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatnotequal (const unsigned char *pc, Register *reg) {
@@ -1747,10 +1529,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) != MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d NOT EQUAL reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatlesser (const unsigned char *pc, Register *reg) {
@@ -1764,10 +1543,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) < MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d LESSER THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatlesserequal (const unsigned char *pc, Register *reg) {
@@ -1781,10 +1557,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) <= MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d LESSER/EQUAL THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatgreater (const unsigned char *pc, Register *reg) {
@@ -1798,10 +1571,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) > MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d GREATER THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   inline void MeldInterpretVM::execute_floatgreaterequal (const unsigned char *pc, Register *reg) {
@@ -1815,10 +1585,7 @@ namespace MeldInterpret{
     Register *arg2 = (Register*)eval_reg (reg2, &pc, reg);
     Register *dest = (Register*)eval_reg (reg3, &pc, reg);
     *dest = (MELD_FLOAT(arg1) >= MELD_FLOAT(arg2));
-#ifdef DEBUG_INSTRS
-    printf ("--%d--\t FLOAT reg %d GREATER/EQUAL THAN reg %d TO reg %d\n",
-        getBlockId(), reg1, reg2, reg3);
-#endif
+
   }
 
   /* END OF INSTR EXECUTION FUNCTIONS */
@@ -2220,17 +1987,6 @@ namespace MeldInterpret{
       return;
     }
 
-#ifdef DEBUG_INSTRS
-    if (isNew == 1) {
-      fprintf(stderr, "\x1b[1;32m--%d--\tExecuting tuple ", getBlockId());
-      tuple_print (tuple, stderr);
-      fprintf(stderr, "\x1b[0m\n");
-    } else if (isNew == -1) {
-      fprintf(stderr, "\x1b[1;31m--%d--\tDeleting tuple ", getBlockId());
-      tuple_print (tuple, stderr);
-      fprintf(stderr, "\x1b[0m\n");
-    }
-#endif
 
     if (TYPE_IS_ACTION(type)) {
       if(isNew > 0)
@@ -2255,9 +2011,7 @@ namespace MeldInterpret{
             if (!TYPE_IS_LINEAR(type))
               process_bytecode(tuple, TYPE_START(TUPLE_TYPE(tuple)), isNew,
                   NOT_LINEAR, reg, PROCESS_TUPLE);
-#ifdef DEBUG_INSTRS
-            fprintf(stdout, "\x1b[1;32m--%d--\tDelete Iter success for  %s\x1b[0m\n", getBlockId(), tuple_names[type]);
-#endif
+
             FREE_TUPLE(queue_dequeue_pos(queue, current));
             /* Also free retraction fact */
             FREE_TUPLE(tuple);
@@ -2275,9 +2029,7 @@ namespace MeldInterpret{
 
       // if deleting, return
       if (isNew <= 0) {
-#ifdef DEBUG_INSTRS
-        fprintf(stdout, "\x1b[1;31m--%d--\tDelete Iter failure for %s\x1b[0m\n", getBlockId(), tuple_names[type]);
-#endif
+
         FREE_TUPLE(tuple);
         return;
       }
@@ -2351,11 +2103,7 @@ namespace MeldInterpret{
               aggregate_recalc(cur, reg, false);
           } else
             aggregate_recalc(cur, reg, false);
-#ifdef DEBUG_INSTRS
-          fprintf(stdout,
-              "\x1b[1;32m--%d--\tAgg delete Iter success for %s\x1b[0m\n",
-              getBlockId(), tuple_names[type]);
-#endif
+
 
           FREE_TUPLE(tuple);
           return;
@@ -2364,11 +2112,6 @@ namespace MeldInterpret{
 
       // if deleting, return
       if (isNew <= 0) {
-#ifdef DEBUG_INSTRS
-        fprintf(stdout,
-            "\x1b[1;32m--%d--\tAgg delete Iter failure for %s\x1b[0m\n",
-            getBlockId(), tuple_names[type]);
-#endif
 
         FREE_TUPLE(tuple);
         return;
@@ -2402,233 +2145,9 @@ namespace MeldInterpret{
     process_bytecode(tuple, TYPE_START(type), isNew, NOT_LINEAR, reg, PROCESS_TUPLE);
   }
 
-#ifdef LOG_DEBUG
-#define MAX_NAME_SIZE 30
-  void
-    MeldInterpretVM::print_bytecode(const unsigned char *pc) {
-      char  s[MAX_NAME_SIZE];
-
-      snprintf(s, MAX_NAME_SIZE*sizeof(char), "%u", (unsigned) pc - (unsigned) meld_prog);
-      printDebug(s);
-
-      switch (*(const unsigned char*)pc) {
-        case RETURN_INSTR: 		/* 0x0 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "RETURN_INSTR");
-          break;
-        case NEXT_INSTR: 		/* 0x1 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "NEXT_INSTR");
-          break;
-        case PERS_ITER_INSTR: 		/* 0x02 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "PERS_ITER_INSTR");
-          break;
-        case LINEAR_ITER_INSTR: 		/* 0x05 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "LINEAR_ITER_INSTR");
-          break;
-        case NOT_INSTR: 		/* 0x07 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "NOT_INSTR");
-          break;
-        case SEND_INSTR: 		/* 0x08 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "SEND_INSTR");
-          break;
-        case RULE_INSTR: 		/* 0x10 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "RULE_INSTR");
-          break;
-        case RULE_DONE_INSTR: 		/* 0x11 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "RULE_DONE_INSTR");
-          break;
-        case SEND_DELAY_INSTR: 		/* 0x15 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "SEND_DELAY_INSTR");
-          break;
-        case RETURN_LINEAR_INSTR:		/* 0xd0 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "RETURN_LINEAR_INSTR");
-          break;
-        case RETURN_DERIVED_INSTR:		/* 0xf0 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "RETURN_DERIVED_INSTR");
-          break;
-        case MVINTFIELD_INSTR: 		/* 0x1e */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVINTFIELD_INSTR");
-          break;
-        case MVFIELDFIELD_INSTR: 		/* 0x21 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVFIELDFIELD_INSTR");
-          break;
-        case MVFIELDREG_INSTR: 		/* 0x22 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVFIELDREG_INSTR");
-          break;
-        case MVPTRREG_INSTR: 		/* 0x23 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVPTRREG_INSTR");
-          break;
-        case MVREGFIELD_INSTR: 		/* 0x26 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVFIELDREG_INSTR");
-        case MVHOSTFIELD_INSTR: 		/* 0x28 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVHOSTFIELD_INSTR");
-          break;
-          /* NOT TESTED */
-        case MVFLOATFIELD_INSTR: 		/* 0x2d */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVFLOATFIELD_INSTR");
-          break;
-          /* NOT TESTED */
-        case MVFLOATREG_INSTR: 		/* 0x2e */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVFLOATREG_INSTR");
-          break;
-          /* NOT TESTED */
-        case MVHOSTREG_INSTR: 		/* 0x37 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVHOSTREG_INSTR");
-          break;
-        case ADDRNOTEQUAL_INSTR: 		/* 0x38 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "ADDRNOTEQUAL_INSTR");
-          break;
-        case ADDREQUAL_INSTR: 		/* 0x39 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "ADDREQUAL_INSTR");
-          break;
-        case INTMINUS_INSTR: 		/* 0x3a */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTMINUS_INSTR");
-          break;
-        case INTEQUAL_INSTR: 		/* 0x3b */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTEQUAL_INSTR");
-          break;
-        case INTNOTEQUAL_INSTR: 		/* 0x3c */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTNOTEQUAL_INSTR");
-          break;
-
-        case INTPLUS_INSTR: 		/* 0x3d */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTPLUS_INSTR");
-          break;
-        case INTLESSER_INSTR: 		/* 0x3e */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTLESSER_INSTR");
-          break;
-
-        case INTGREATEREQUAL_INSTR: 		/* 0x3f */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTGREATEREQUAL_INSTR");
-          break;
-        case ALLOC_INSTR: 		/* 0x40 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "ALLOC_INSTR");
-          break;
-          /* NOT TESTED */
-        case BOOLOR_INSTR: 		/* 0x41 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "BOOLOR_INSTR");
-          break;
-
-        case INTLESSEREQUAL_INSTR: 		/* 0x42 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTLESSEREQUAL_INSTR");
-          break;
-        case INTGREATER_INSTR: 		/* 0x43 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTEGREATER_INSTR");
-          break;
-        case INTMUL_INSTR: 		/* 0x44 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTMUL_INSTR");
-          break;
-        case INTDIV_INSTR: 		/* 0x45 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTDIV_INSTR");
-          break;
-        case FLOATPLUS_INSTR: 		/* 0x46 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATPLUS_INSTR");
-          break;
-        case FLOATMINUS_INSTR: 		/* 0x47 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATMINUS_INSTR");
-          break;
-        case FLOATMUL_INSTR: 		/* 0x48 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATMUL_INSTR");
-          break;
-        case FLOATDIV_INSTR: 		/* 0x49 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATDIV_INSTR");
-          break;
-        case FLOATEQUAL_INSTR: 		/* 0x4a */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATEQUAL_INSTR");
-          break;
-        case FLOATNOTEQUAL_INSTR: 		/* 0x4b */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATNOTEQUAL_INSTR");
-          break;
-        case FLOATLESSER_INSTR: 		/* 0x4c */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATLESSER_INSTR");
-          break;
-        case FLOATLESSEREQUAL_INSTR: 	/* 0x4d */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATLESSEREQUAL_INSTR");
-          break;
-        case FLOATGREATER_INSTR: 		/* 0x4e */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATGREATER_INSTR");
-          break;
-        case FLOATGREATEREQUAL_INSTR: 	/* 0x4f */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "FLOATGREATEREQUAL_INSTR");
-          break;
-        case MVREGREG_INSTR: 		/* 0x50 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "MVREGREG_INSTR");
-          break;
-        case BOOLEQUAL_INSTR: 		/* 0x51 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "BOOLEQUAL_INSTR");
-          break;
-
-        case BOOLNOTEQUAL_INSTR: 		/* 0x51 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "BOOLNOTEQUAL_INSTR");
-          break;
-        case IF_INSTR: 		/* 0x60 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "IF_INSTR");
-          break;
-        case CALL1_INSTR: 		/* 0x69 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "CALL1_INSTR");
-          break;
-        case ADDLINEAR_INSTR: 		/* 0x77 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "ADDLINEAR_INSTR");
-          break;
-        case ADDPERS_INSTR: 		/* 0x78 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "ADDPERS_INSTR");
-          break;
-        case RUNACTION_INSTR: 		/* 0x79 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "RUNACTION_INSTR");
-          break;
-        case UPDATE_INSTR: 		/* 0x7b */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), " UPDATE_INSTR");
-          break;
-        case REMOVE_INSTR: 		/* 0x80 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "REMOVE_INSTR");
-          break;
-        case IF_ELSE_INSTR: 		/* 0x81 */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "IF_ELSE_");
-          break;
-          /* NOT TESTED */
-        case JUMP_INSTR:
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "JUMP_INSTR");
-          break;
-        case INTMOD_INSTR: 		/* 0x3d */
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "INTMOD_INSTR");
-          break;
-        default:
-          snprintf(s, MAX_NAME_SIZE*sizeof(char), "UNKNOWN");
-      }
-      printDebug(s);
-    }
-#endif
 
   int MeldInterpretVM::process_bytecode (tuple_t tuple, const unsigned char *pc, int isNew, int isLinear, Register *reg, byte state) {
-#ifdef DEBUG_INSTRS
 
-    /* if (PROCESS_TYPE(state) == PROCESS_TUPLE) { */
-    /*     pthread_mutex_lock(&(printMutex)); */
-    /*     printf ("\n--%d--\tPROCESS TUPLE ", getBlockId()); */
-    /*     tuple_print (tuple, stdout); */
-    /*     printf ("\n"); */
-    /*     pthread_mutex_unlock(&(printMutex)); */
-    /*   } */
-    /* #else */
-
-
-    if (PROCESS_TYPE(state) == PROCESS_TUPLE)
-      printf ("\n--%d--\tPROCESS TUPLE %s -- isNew = %d\n", getBlockId(), tuple_names[TUPLE_TYPE(tuple)], isNew);
-    else{
-      if (PROCESS_TYPE(state) == PROCESS_ITER) {
-        printf ("--%d--\t PROCESS ITER %s\n", getBlockId(),
-            tuple_names[TUPLE_TYPE(tuple)]);
-      }
-
-      /* Dont't print if rule is persistent */
-      else if (PROCESS_TYPE(state) == PROCESS_RULE) {
-        if (!RULE_ISPERSISTENT(RULE_NUMBER(state)))
-          printf ("--%d--\t PROCESS RULE %d: %s\n", getBlockId(),
-              RULE_NUMBER(state), rule_names[RULE_NUMBER(state)]);
-
-      } else
-        printf ("\n--%d--\tERROR: UNKNOWN PROCESS TYPE\n", getBlockId());
-    }
-#endif
 
     /* Move tuple to register 0 so it can be accessed */
     if (state == PROCESS_TUPLE)
@@ -2638,26 +2157,16 @@ namespace MeldInterpret{
 
     for (;;) {
 eval_loop:
-#ifdef DEBUG_INSTRS
-#ifdef LOG_DEBUG
-      print_bytecode(pc);
-#endif
-#endif
+
 
       switch (*(const unsigned char*)pc) {
         case RETURN_INSTR: {	/* 0x0 */
-#ifdef DEBUG_INSTRS
-                             if (!(PROCESS_TYPE(state) == PROCESS_RULE
-                                   && RULE_ISPERSISTENT(RULE_NUMBER(state))) )
-                               printf ("--%d--\tRETURN\n", getBlockId());
-#endif
+
                              return RET_RET;
                            }
 
         case NEXT_INSTR: {	/* 0x1 */
-#ifdef DEBUG_INSTRS
-                           printf ("--%d--\t NEXT\n", getBlockId());
-#endif
+
                            return RET_NEXT;
                          }
 
@@ -2709,19 +2218,13 @@ eval_loop:
 
         case RULE_INSTR: {	/* 0x10 */
                            const byte *npc = pc + RULE_BASE;
-#ifdef DEBUG_INSTRS
-                           byte rule_number = FETCH(++pc);
-                           printf ("--%d--\t RULE %d\n", getBlockId(),
-                               rule_number);
-#endif
+
                            pc = npc;
                            goto eval_loop;
                          }
 
         case RULE_DONE_INSTR: {	/* 0x11 */
-#ifdef DEBUG_INSTRS
-                                printf ("--%d--\t RULE DONE\n", getBlockId());
-#endif
+
                                 const byte *npc = pc + RULE_DONE_BASE;
                                 pc = npc;
                                 goto eval_loop;
@@ -2736,16 +2239,12 @@ eval_loop:
                                }
 
         case RETURN_LINEAR_INSTR: {		/* 0xd0 */
-#ifdef DEBUG_INSTRS
-                                    printf ("--%d--\tRETURN LINEAR\n", getBlockId());
-#endif
+
                                     return RET_LINEAR;
                                   }
 
         case RETURN_DERIVED_INSTR: {		/* 0xf0 */
-#ifdef DEBUG_INSTRS
-                                     printf ("--%d--\tRETURN DERIVED\n", getBlockId());
-#endif
+
                                      return RET_DERIVED;
                                    }
 
@@ -2779,9 +2278,7 @@ eval_loop:
 
         case MVPTRREG_INSTR: {	/* 0x23 */
                                const byte *npc = pc + MVPTRREG_BASE;
-#ifdef DEBUG_INSTRS
-                               printf ("--%d--\tMOVE PTR TO REG -- Do nothing\n", getBlockId());
-#endif
+
                                /* TODO: Do something if used elsewhere than axiom derivation */
                                pc = npc;
                                goto eval_loop;
@@ -3034,19 +2531,13 @@ eval_loop:
                          Register *if_reg = (Register*)eval_reg (reg_index, &pc, reg);
 
                          if (!(unsigned char)(*if_reg)) {
-#ifdef DEBUG_INSTRS
-                           printf ("--%d--\t IF (reg %d) -- Failed\n",
-                               getBlockId(), reg_index);
-#endif
+
 
                            pc = base + IF_JUMP(pc);
                            goto eval_loop;
                          }
                          /* else process if content */
-#ifdef DEBUG_INSTRS
-                         printf ("--%d--\t IF (reg %d) -- Success\n",
-                             getBlockId(), reg_index);
-#endif
+
                          pc = npc;
                          goto eval_loop;
                        }
@@ -3107,10 +2598,7 @@ eval_loop:
 
                               /* If false, jump to else */
                               if (!(unsigned char)(*if_reg)) {
-#ifdef DEBUG_INSTRS
-                                printf ("--%d--\t IF_ELSE (reg %d) -- ELSE\n",
-                                    getBlockId(), reg_index);
-#endif
+
 
                                 pc = base + IF_JUMP(pc);
                                 goto eval_loop;
@@ -3118,10 +2606,7 @@ eval_loop:
                                 /* Else, process if until a jump instruction is encountered
                                  * (it seems...)
                                  */
-#ifdef DEBUG_INSTRS
-                                printf ("--%d--\t IF_ELSE (reg %d) -- ELSE\n",
-                                    getBlockId(), reg_index);
-#endif
+
 
                                 pc = npc;
                                 goto eval_loop;
@@ -3131,9 +2616,7 @@ eval_loop:
                             /* NOT TESTED */
         case JUMP_INSTR: {
                            ++pc;
-#ifdef DEBUG_INSTRS
-                           printf ("--%d--\t JUMP TO\n", getBlockId());
-#endif
+
                            pc += JUMP_BASE + IF_JUMP(pc);
                            goto eval_loop;
                          }
@@ -3207,12 +2690,9 @@ eval_loop:
       strcat(str,tmp);
     }
     strcat(str, ")");
-#ifdef LOG_DEBUG
-    printDebug(str);
-#else
+
     OUTPUT << str << endl;
     fprintf(fp,"%s",str);
-#endif
   }
 
   /* Prints the content of the whole database */
@@ -3235,11 +2715,9 @@ eval_loop:
       snprintf(str,MAX_STRING_SIZE*sizeof(char),
           "tuple %s (type %d, size: %d)",
           tuple_names[i], i, (int)TYPE_SIZE(i));
-#ifdef LOG_DEBUG
-      printDebug(str);
-#else
+
       fprintf(stderr, "%s\n",str);
-#endif
+
       tuple_entry *tupleEntry;
       for (tupleEntry = TUPLES[i].head; tupleEntry != NULL; tupleEntry = tupleEntry->next) {
         sprintf(str,"  ");
@@ -3255,18 +2733,14 @@ eval_loop:
             strcat(str,tmp);
           }
           strcat(str, "\b\b\b]]]");
-#ifdef LOG_DEBUG
-          printDebug(str);
-#else
+
           fprintf(stderr, "%s\n",str);
-#endif
+
         } else {
           sprintf(str, "x%d", tupleEntry->records.count);
-#ifdef LOG_DEBUG
-          printDebug(str);
-#else
+
           fprintf(stderr, "%s\n",str);
-#endif
+
         }
       }
     }
@@ -3311,11 +2785,9 @@ eval_loop:
       }
 
       s[MAX_STRING_SIZE-1] = '\0';
-#ifdef LOG_DEBUG
-      printDebug(s);
-#else
+
       printf("%s\n",s);
-#endif
+
     }
   }
 
@@ -3359,7 +2831,4 @@ eval_loop:
     }
   }
 
-  void MeldInterpretVM::printDebug(string str){
-    OUTPUT << str << endl;
-  }
 }

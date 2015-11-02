@@ -75,7 +75,6 @@ switch (Direction(d)) {
 			return Top;
 			break;
 		default:
-			ERRPUT << "*** ERROR *** : unknown face" << endl;
 			return -1;
 			break;
 	}

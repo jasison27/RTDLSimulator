@@ -27,11 +27,6 @@ sudo apt-get install libglew-dev
 sudo apt-get install sbcl
 make
 cd applicationsBin/blinkyMeld/
-<<<<<<< HEAD
-./compile-meld.sh meld/programs/demo.meld
+./compile-meld.sh meld/programs/demo.meld 
 ./blinkyMeld
 
-=======
-./compile-meld.sh meld/programs/demo.meld 
-./blinkyMeld 
->>>>>>> e5a826ed39704c899cc0d4b26561eb1d908495af

@@ -1,4 +1,0 @@
-type linear tap(node).
-type route neighbor(node, node, int).
-
-position(A, X, Y, Z), tap(A) -o !setPosition(A, X+2, Y+2), position(A, X+2, Y+2, Z).

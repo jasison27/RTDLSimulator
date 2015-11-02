@@ -713,7 +713,6 @@ namespace MeldInterpret {
 
       void print_newTuples ();
       void print_newStratTuples ();
-      void printDebug(string str);
       NodeID getBlockId();
       /* ************* TUPLE HANDLING FUNCTIONS  ************* */
 
@@ -733,21 +732,13 @@ namespace MeldInterpret {
       /*static Why static again ?*/
       inline tuple_t tuple_alloc(tuple_type type)
       {
-#ifdef TUPLE_ALLOC_CHECKS
-        if(type >= NUM_TYPES || type < 0) {
-          fprintf(stderr, "Unrecognized type: %d\n", type);
-          exit(EXIT_FAILURE);
-        }
-#endif
+
 
         tuple_t tuple = ALLOC_TUPLE(TYPE_SIZE(type));
 
         TUPLE_TYPE(tuple) = type;
 
-#ifdef TUPLE_ALLOC_DEBUG
-        printf("New %s(%d) tuple -- size: %d\n", tuple_names[type],
-            type, TYPE_SIZE(type));
-#endif
+
 
         return tuple;
       }

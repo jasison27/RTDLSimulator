@@ -284,7 +284,6 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
       //info << "Removing tuple";
       break;
     default:
-      ERRPUT << "*** ERROR *** : unknown local event";
       break;
   }
   if(info.str() != "") {
