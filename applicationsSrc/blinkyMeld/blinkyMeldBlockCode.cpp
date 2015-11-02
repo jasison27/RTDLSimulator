@@ -11,6 +11,8 @@
 
 #include "trace.h"
 
+#include "global.h"
+
 using namespace std;
 using namespace BlinkyBlocks;
 using namespace MeldInterpret;
@@ -45,6 +47,7 @@ void BlinkyMeldBlockCode::init() {
 
   if((vm != NULL)) {
     vm->enqueue_position((meld_int)bb->position.pt[0],(meld_int)bb->position.pt[1],(meld_int)bb->position.pt[2]);
+    vm->enqueue_id((meld_int)global_id++);
     BaseSimulator::getScheduler()->schedule(new ComputePredicateEvent(BaseSimulator::getScheduler()->now(), bb));
 
     if((MeldInterpret::getScheduler()->getMode() == SCHEDULER_MODE_FASTEST) && !vm->deterministicSet) {
@@ -179,14 +182,14 @@ void BlinkyMeldBlockCode::processLocalEvent(EventPtr pev) {
         int _z = position.pt[2];
         if (z != _z) {
           puts("error with move to action");
-        } else if (y == _y && x != _x) {
+        } else if (x != _x) {
           int tx = _x + (x - _x) / abs(x - _x);
-          bb->setPosition(tx,y,z);
+          bb->setPosition(tx,_y,_z);
           vm->enqueue_position((meld_int)bb->position.pt[0],(meld_int)bb->position.pt[1],(meld_int)bb->position.pt[2]);
           BaseSimulator::getScheduler()->schedule(new ComputePredicateEvent(BaseSimulator::getScheduler()->now(), bb));
-        } else if (x == _x && y != _y) {
+        } else if (y != _y) {
           int ty = _y + (y - _y) / abs(y - _y);
-          bb->setPosition(x,ty,z);
+          bb->setPosition(_x,ty,_z);
           vm->enqueue_position((meld_int)bb->position.pt[0],(meld_int)bb->position.pt[1],(meld_int)bb->position.pt[2]);
           BaseSimulator::getScheduler()->schedule(new ComputePredicateEvent(BaseSimulator::getScheduler()->now(), bb));
         } else {

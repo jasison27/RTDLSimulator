@@ -652,6 +652,7 @@ namespace MeldInterpret {
       tuple_type TYPE_MOVETO;
       tuple_type TYPE_READYCOUNT;
       tuple_type TYPE_UNBROADCASTED;
+      tuple_type TYPE_ID;
 
       BlinkyBlocks::BlinkyBlocksBlock *host;
 
@@ -672,6 +673,7 @@ namespace MeldInterpret {
       void enqueueNewTuple(tuple_t tuple, record_type isNew);
       void enqueue_edge(NodeID neighbor);
       void enqueue_readycount(meld_int count);
+      void enqueue_id(meld_int id);
       void enqueue_unbroadcasted();
       void enqueue_position(meld_int x, meld_int y, meld_int z);
       void enqueue_face(NodeID neighbor, meld_int face, int isNew);

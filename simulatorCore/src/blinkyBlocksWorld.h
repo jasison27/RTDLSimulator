@@ -54,6 +54,7 @@ public:
 	}
 
 	virtual void addBlock(int blockId, BlinkyBlocksBlockCode *(*blinkyBlockCodeBuildingFunction)(BlinkyBlocksBlock*), const Vecteur &pos, const Color &col);
+	void addObstacle(const Vecteur &pos,const Color &col);
 	void deleteBlock(BlinkyBlocksBlock *bb);
 	inline void setBlocksSize(float *siz) { blockSize[0] = siz[0]; blockSize[1] = siz[1]; blockSize[2] = siz[2]; };
 

@@ -38,6 +38,7 @@ namespace MeldInterpret{
     TYPE_POSITION = -1;
     TYPE_SETPOSITION = -1;
     TYPE_MOVETO = -1;
+    TYPE_ID = -1;
 
     OUTPUT << "MeldInterpretVM constructor" << endl;
     vm_alloc();
@@ -178,6 +179,14 @@ namespace MeldInterpret{
     enqueueNewTuple(tuple, 1);
   }
 
+  /* Enqueue a id tuple */
+  void MeldInterpretVM::enqueue_id(meld_int id){
+    if(TYPE_ID == -1) return;
+    tuple_t tuple = tuple_alloc(TYPE_ID);
+    SET_TUPLE_FIELD(tuple, 0, &id);
+    enqueueNewTuple(tuple, 1);
+  }
+
   /* Enqueue a readycount tuple */
   void MeldInterpretVM::enqueue_readycount(meld_int count) {
     if (TYPE_READYCOUNT == -1) return;
@@ -265,6 +274,8 @@ namespace MeldInterpret{
         TYPE_EDGE = i;
       else if (strcmp(TYPE_NAME(i), "unbroadcasted") == 0)
         TYPE_UNBROADCASTED = i;
+      else if (strcmp(TYPE_NAME(i), "id") == 0)
+        TYPE_ID = i;
     }
   }
 
