@@ -672,9 +672,7 @@ namespace MeldInterpret {
       NodeID get_neighbor_ID(int face);
       void enqueueNewTuple(tuple_t tuple, record_type isNew);
       void enqueue_edge(NodeID neighbor);
-      void enqueue_readycount(meld_int count);
       void enqueue_id(meld_int id);
-      void enqueue_unbroadcasted();
       void enqueue_position(meld_int x, meld_int y, meld_int z);
       void enqueue_face(NodeID neighbor, meld_int face, int isNew);
       void enqueue_count(meld_int count, int isNew);
