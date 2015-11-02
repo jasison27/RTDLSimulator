@@ -28,5 +28,5 @@ sudo apt-get install sbcl
 make
 cd applicationsBin/blinkyMeld/
 ./compile-meld.sh meld/programs/demo.meld 
-./blinkyMeld demo.xml
+./blinkyMeld
 
